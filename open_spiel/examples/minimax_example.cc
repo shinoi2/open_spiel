@@ -50,7 +50,7 @@ void PlayBreakthrough() {
                     BlackPieceAdvantage(state) :
                     -BlackPieceAdvantage(state));
             },
-        kSearchDepth, player);
+        kSearchDepth, player, std::mt19937(kSeed));
 
     std::cout << std::endl << "Player " << player << " choosing action "
               << state->ActionToString(player, value_action.second)

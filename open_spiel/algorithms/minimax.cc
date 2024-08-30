@@ -49,7 +49,7 @@ namespace {
 double _alpha_beta(State* state, int depth, double alpha, double beta,
                    std::function<double(const State&)> value_function,
                    Player maximizing_player, Action* best_action,
-                   bool use_undo) {
+                   std::mt19937 rng, bool use_undo) {
   if (state->IsTerminal()) {
     return state->PlayerReturn(maximizing_player);
   }
@@ -67,29 +67,43 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
   Player player = state->CurrentPlayer();
   if (player == maximizing_player) {
     double value = -std::numeric_limits<double>::infinity();
-
-    for (Action action : state->LegalActions()) {
+    double action_value = 0;
+    double best_action_value = -std::numeric_limits<double>::infinity();
+    auto actions = state->LegalActions();
+    std::shuffle(std::begin(actions), std::end(actions), rng);
+    for (Action action : actions) {
       double child_value = 0;
       if (use_undo) {
         state->ApplyAction(action);
+        if (best_action != nullptr) {
+          action_value = value_function(*state);
+        }
         child_value =
             _alpha_beta(state, /*depth=*/depth - 1, /*alpha=*/alpha,
                         /*beta=*/beta, value_function, maximizing_player,
-                        /*best_action=*/nullptr, use_undo);
+                        /*best_action=*/nullptr, rng, use_undo);
         state->UndoAction(player, action);
       } else {
         std::unique_ptr<State> child_state = state->Child(action);
+        if (best_action != nullptr) {
+          action_value = value_function(*child_state);
+        }
         child_value =
             _alpha_beta(child_state.get(), /*depth=*/depth - 1, /*alpha=*/alpha,
                         /*beta=*/beta, value_function, maximizing_player,
-                        /*best_action=*/nullptr, use_undo);
+                        /*best_action=*/nullptr, rng, use_undo);
       }
 
       if (child_value > value) {
         value = child_value;
         if (best_action != nullptr) {
+          best_action_value = action_value;
           *best_action = action;
         }
+      }
+      else if (child_value == value && best_action != nullptr && action_value > best_action_value) {
+        best_action_value = action_value;
+        *best_action = action;
       }
 
       alpha = std::max(alpha, value);
@@ -101,29 +115,43 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
     return value;
   } else {
     double value = std::numeric_limits<double>::infinity();
-
-    for (Action action : state->LegalActions()) {
+    double action_value = 0;
+    double best_action_value = std::numeric_limits<double>::infinity();
+    auto actions = state->LegalActions();
+    std::shuffle(std::begin(actions), std::end(actions), rng);
+    for (Action action : actions) {
       double child_value = 0;
       if (use_undo) {
         state->ApplyAction(action);
+        if (best_action != nullptr) {
+          action_value = value_function(*state);
+        }
         child_value =
             _alpha_beta(state, /*depth=*/depth - 1, /*alpha=*/alpha,
                         /*beta=*/beta, value_function, maximizing_player,
-                        /*best_action=*/nullptr, use_undo);
+                        /*best_action=*/nullptr, rng, use_undo);
         state->UndoAction(player, action);
       } else {
         std::unique_ptr<State> child_state = state->Child(action);
+        if (best_action != nullptr) {
+          action_value = value_function(*child_state);
+        }
         child_value =
             _alpha_beta(child_state.get(), /*depth=*/depth - 1, /*alpha=*/alpha,
                         /*beta=*/beta, value_function, maximizing_player,
-                        /*best_action=*/nullptr, use_undo);
+                        /*best_action=*/nullptr, rng, use_undo);
       }
 
       if (child_value < value) {
         value = child_value;
         if (best_action != nullptr) {
+          best_action_value = action_value;
           *best_action = action;
         }
+      }
+      else if (child_value == value && best_action != nullptr && action_value < best_action_value) {
+        best_action_value = action_value;
+        *best_action = action;
       }
 
       beta = std::min(beta, value);
@@ -222,7 +250,7 @@ double _expectiminimax(const State* state, int depth,
 std::pair<double, Action> AlphaBetaSearch(
     const Game& game, const State* state,
     std::function<double(const State&)> value_function, int depth_limit,
-    Player maximizing_player, bool use_undo) {
+    Player maximizing_player, std::mt19937 rng, bool use_undo) {
   SPIEL_CHECK_LE(game.NumPlayers(), 2);
 
   // Check to ensure the correct setup intended for this algorithm.
@@ -250,7 +278,7 @@ std::pair<double, Action> AlphaBetaSearch(
   double value = _alpha_beta(
       search_root.get(), /*depth=*/depth_limit, /*alpha=*/-infinity,
       /*beta=*/infinity, value_function, maximizing_player, &best_action,
-      use_undo);
+      rng, use_undo);
 
   return {value, best_action};
 }

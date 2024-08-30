@@ -545,6 +545,12 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
 
   mod.add_type<open_spiel::algorithms::Evaluator>("Evaluator");
 
+  mod.add_type<open_spiel::algorithms::StateRewardEvaluator>(
+         "StateRewardEvaluator",
+         jlcxx::julia_base_type<open_spiel::algorithms::Evaluator>())
+      .method("evaluate", &open_spiel::algorithms::Evaluator::Evaluate)
+      .method("prior", &open_spiel::algorithms::Evaluator::Prior);
+
   mod.add_type<open_spiel::algorithms::RandomRolloutEvaluator>(
          "RandomRolloutEvaluator",
          jlcxx::julia_base_type<open_spiel::algorithms::Evaluator>())

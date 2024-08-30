@@ -354,7 +354,7 @@ int Score_p0(std::array<Seat, kDeckSize> holder,
   Seat decl = Seat(state.last_bidder % 2);
   TinyBridgePlayState play{game, trumps, leader, holder};
   const double tricks =
-      algorithms::AlphaBetaSearch(*game, &play, nullptr, -1, decl).first;
+      algorithms::AlphaBetaSearch(*game, &play, nullptr, -1, decl, std::mt19937(42)).first;
   SPIEL_CHECK_GE(tricks, 0);
   SPIEL_CHECK_LE(tricks, kNumTricks);
   const int declarer_score =

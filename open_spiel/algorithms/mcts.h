@@ -91,6 +91,16 @@ class Evaluator {
   virtual ActionsAndProbs Prior(const State& state) = 0;
 };
 
+class StateRewardEvaluator : public Evaluator {
+  public:
+    explicit StateRewardEvaluator() = default;
+    // Runs random games, returning the average returns.
+    std::vector<double> Evaluate(const State& state) override;
+
+    // Returns equal probability for each action.
+    ActionsAndProbs Prior(const State& state) override;
+};
+
 // A simple evaluator that returns the average outcome of playing random actions
 // from the given state until the end of the game.
 // n_rollouts is the number of random outcomes to be considered.

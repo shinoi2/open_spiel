@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/bots/pimc_bot.h"
+#include "open_spiel/algorithms/pimc_bot.h"
 
 #include <cstdint>
 #include <functional>
@@ -29,15 +29,17 @@
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
+namespace algorithms {
 
 PIMCBot::PIMCBot(
     std::function<double(const State&, Player player)> value_function,
-    Player player_id, uint32_t seed, int num_determinizations, int depth_limit)
+    Player player_id, uint32_t seed, int num_determinizations, int depth_limit, bool use_undo)
     : rng_(seed),
       value_function_(value_function),
       player_id_(player_id),
       num_determinizations_(num_determinizations),
-      depth_limit_(depth_limit) {}
+      depth_limit_(depth_limit),
+      use_undo(use_undo) {}
 
 Action PIMCBot::Step(const State& state) {
   std::pair<std::vector<int>, Action> search_result = Search(state);
@@ -109,7 +111,7 @@ std::pair<std::vector<int>, Action> PIMCBot::Search(const State& root_state) {
           [this, player](const State& state) {
             return this->value_function_(state, player);
           },
-          depth_limit_, player, /*use_undo*/ false);
+          depth_limit_, player, rng_, use_undo);
       action_counts[search_result.second] += 1;
     } else {
       std::pair<std::vector<double>, Action> search_result =
@@ -132,4 +134,5 @@ std::pair<std::vector<int>, Action> PIMCBot::Search(const State& root_state) {
 
   return {counts, best_action};
 }
+}  // namespace algorithms
 }  // namespace open_spiel

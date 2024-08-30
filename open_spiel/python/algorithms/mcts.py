@@ -78,6 +78,15 @@ class RandomRolloutEvaluator(Evaluator):
       return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
 
 
+class StateRewardEvaluator(Evaluator):
+    def evaluate(self, state):
+        return state.rewards()
+
+    def prior(self, state):
+        legal_actions = state.legal_actions()
+        return [1.0 / len(legal_actions) for _ in legal_actions]
+
+
 class SearchNode(object):
   """A node in the search tree.
 

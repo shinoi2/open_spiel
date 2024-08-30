@@ -40,6 +40,21 @@ int MemoryUsedMb(int nodes) {
   return nodes * sizeof(SearchNode) / (1 << 20);
 }
 
+std::vector<double> StateRewardEvaluator::Evaluate(const State& state) {
+  return state.Rewards();
+}
+
+ActionsAndProbs StateRewardEvaluator::Prior(const State& state) {
+  // Returns equal probability for all actions.
+  std::vector<Action> legal_actions = state.LegalActions();
+  ActionsAndProbs prior;
+  prior.reserve(legal_actions.size());
+  for (const Action& action : legal_actions) {
+    prior.emplace_back(action, 1.0 / legal_actions.size());
+  }
+  return prior;
+}
+
 std::vector<double> RandomRolloutEvaluator::Evaluate(const State& state) {
   std::vector<double> result;
   for (int i = 0; i < n_rollouts_; ++i) {

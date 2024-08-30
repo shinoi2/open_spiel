@@ -121,6 +121,7 @@ EXPECTED_GAMES = frozenset([
     "quoridor",
     "repeated_game",
     "rbc",
+    "renju",
     "restricted_nash_response",
     "sheriff",
     "skat",

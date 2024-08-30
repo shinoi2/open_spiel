@@ -156,6 +156,10 @@ set(GAME_SOURCES
   quoridor/quoridor.h
   rbc/rbc.cc
   rbc/rbc.h
+  renju/renju.cc
+  renju/renju.h
+  renju/renju_evalution.cc
+  renju/renju_evalution.h
   sheriff/sheriff.cc
   sheriff/sheriff.h
   skat/skat.cc
@@ -571,6 +575,10 @@ add_test(quoridor_test quoridor_test)
 add_executable(rbc_test rbc/rbc_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(rbc_test rbc_test)
+
+add_executable(renju_test renju/renju_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(renju_test renju_test)
 
 add_executable(sheriff_test sheriff/sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

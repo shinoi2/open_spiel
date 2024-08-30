@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/bots/pimc_bot.h"
+#include "open_spiel/algorithms/pimc_bot.h"
 
 #include <cstdint>
 #include <ctime>
@@ -27,6 +27,7 @@
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
+namespace algorithms {
 namespace {
 
 constexpr uint32_t kSeed = 18713687;
@@ -74,6 +75,7 @@ void SimpleSelfPlayTest() {
 }
 
 }  // namespace
+}  // namespace algorithms
 }  // namespace open_spiel
 
-int main(int argc, char** argv) { open_spiel::SimpleSelfPlayTest(); }
+int main(int argc, char** argv) { open_spiel::algorithms::SimpleSelfPlayTest(); }

@@ -28,12 +28,13 @@
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
+namespace algorithms {
 
 class PIMCBot : public Bot {
  public:
   PIMCBot(std::function<double(const State&, Player player)> value_function,
           Player player_id, uint32_t seed, int num_determinizations,
-          int depth_limit);
+          int depth_limit, bool use_undo=false);
 
   Action Step(const State& state) override;
 
@@ -54,8 +55,10 @@ class PIMCBot : public Bot {
   const Player player_id_;
   const int num_determinizations_;
   const int depth_limit_;
+  const bool use_undo;
 };
 
+}  // namespace algorithms
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_BOTS_GIN_RUMMY_SIMPLE_GIN_RUMMY_BOT_H_

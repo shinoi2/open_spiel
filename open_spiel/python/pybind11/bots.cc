@@ -23,6 +23,7 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/algorithms/pimc_bot.h"
 #include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
 #include "open_spiel/bots/uci/uci_bot.h"
 #include "open_spiel/game_parameters.h"
@@ -50,6 +51,13 @@ using ::open_spiel::algorithms::SearchNode;
 namespace py = ::pybind11;
 
 }  // namespace
+
+double reward_value_function(const State& state, Player p) {
+  if (state.IsTerminal()) {
+    return state.Returns()[p];
+  }
+  return state.Rewards()[p];
+}
 
 void init_pyspiel_bots(py::module& m) {
   py::classh<Bot, PyBot<Bot>> bot(m, "Bot");
@@ -106,6 +114,10 @@ void init_pyspiel_bots(py::module& m) {
 
   py::class_<algorithms::Evaluator, std::shared_ptr<algorithms::Evaluator>>
       mcts_evaluator(m, "Evaluator");
+  py::class_<algorithms::StateRewardEvaluator, algorithms::Evaluator,
+             std::shared_ptr<algorithms::StateRewardEvaluator>>(
+      m, "StateRewardEvaluator")
+      .def(py::init<>());
   py::class_<algorithms::RandomRolloutEvaluator, algorithms::Evaluator,
              std::shared_ptr<algorithms::RandomRolloutEvaluator>>(
       m, "RandomRolloutEvaluator")
@@ -145,6 +157,18 @@ void init_pyspiel_bots(py::module& m) {
               algorithms::ChildSelectionPolicy::UCT)
       .def("step", &algorithms::MCTSBot::Step)
       .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
+
+  py::classh<algorithms::PIMCBot, Bot>(m, "PIMCBot")
+      .def(
+          py::init([](Player player, uint32_t seed, int num_determinizations,
+                      int depth_limit, bool use_undo) {
+            return new algorithms::PIMCBot(
+              reward_value_function, player, seed, num_determinizations,
+              depth_limit, use_undo);
+          }),
+          py::arg("player"), py::arg("seed"), py::arg("num_determinizations"),
+          py::arg("depth_limit"), py::arg("use_undo") = false)
+      .def("step", &algorithms::PIMCBot::Step);
 
   py::enum_<algorithms::ISMCTSFinalPolicyType>(m, "ISMCTSFinalPolicyType")
       .value("NORMALIZED_VISIT_COUNT",

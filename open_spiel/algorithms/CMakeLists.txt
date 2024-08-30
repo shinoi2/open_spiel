@@ -49,6 +49,8 @@ add_library (algorithms OBJECT
   matrix_game_utils.h
   nfg_writer.cc
   nfg_writer.h
+  maxn.cc
+  maxn.h
   mcts.cc
   mcts.h
   minimax.cc
@@ -59,6 +61,8 @@ add_library (algorithms OBJECT
   oos.cc
   outcome_sampling_mccfr.cc
   outcome_sampling_mccfr.h
+  pimc_bot.cc
+  pimc_bot.h
   policy_iteration.cc
   policy_iteration.h
   state_distribution.cc
@@ -159,6 +163,10 @@ add_test(oos_test oos_test)
 add_executable(outcome_sampling_mccfr_test outcome_sampling_mccfr_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(outcome_sampling_mccfr_test outcome_sampling_mccfr_test)
+
+add_executable(pimc_bot_test pimc_bot_test.cc
+        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(pimc_bot_test pimc_bot_test)
 
 add_executable(state_distribution_test state_distribution_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
