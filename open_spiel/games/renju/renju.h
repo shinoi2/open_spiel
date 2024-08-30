@@ -50,7 +50,7 @@ enum class CellState {
 // State of an in-play game.
 class RenjuState : public State {
  public:
-  RenjuState(std::shared_ptr<const Game> game);
+  RenjuState(std::shared_ptr<const Game> game, bool forbidden_rule_);
 
   RenjuState(const RenjuState&) = default;
   RenjuState& operator=(const RenjuState&) = default;
@@ -91,6 +91,7 @@ class RenjuState : public State {
   Player current_player_ = 0;         // Player zero goes first
   Player outcome_ = kInvalidPlayer;
   int num_moves_ = 0;
+  bool forbidden_rule_ = false;
 };
 
 // Game object.
@@ -99,7 +100,7 @@ class RenjuGame : public Game {
   explicit RenjuGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumCells; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new RenjuState(shared_from_this()));
+    return std::unique_ptr<State>(new RenjuState(shared_from_this(), forbidden_rule_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
@@ -110,6 +111,8 @@ class RenjuGame : public Game {
   }
   int MaxGameLength() const override { return kNumCells; }
   std::string ActionToString(Player player, Action action_id) const override;
+ private:
+  bool forbidden_rule_ = false;
 };
 
 CellState PlayerToState(Player player);

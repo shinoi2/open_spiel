@@ -19,6 +19,7 @@ class RenjuEvalation {
 public:
   RenjuEvalation() = default;
   double evaluate(const std::array<std::array<int, 15>, 15>& board);
+  bool isForbidenMove(std::array<std::array<int, 15>, 15>& board, const int x, const int y);
 private:
   void evaluateLine(const std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy);
   bool getChesses(const std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy, const int color, std::array<int, 6>& chesses);

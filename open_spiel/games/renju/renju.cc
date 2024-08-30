@@ -44,15 +44,7 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-      {"players", GameParameter(GameParameter::Type::kInt)},
-      {"colors", GameParameter(GameParameter::Type::kInt)},
-      {"ranks", GameParameter(GameParameter::Type::kInt)},
-      {"hand_size", GameParameter(GameParameter::Type::kInt)},
-      {"max_information_tokens", GameParameter(GameParameter::Type::kInt)},
-      {"max_life_tokens", GameParameter(GameParameter::Type::kInt)},
-      {"seed", GameParameter(GameParameter::Type::kInt)},
-      {"random_start_player", GameParameter(GameParameter::Type::kBool)},
-      {"observation_type", GameParameter(GameParameter::Type::kString)},
+      {"forbidden_rule", GameParameter(false)}
     }
 };
 
@@ -137,6 +129,20 @@ std::vector<Action> RenjuState::LegalActions() const {
   if (IsTerminal()) return {};
   // Can move in any empty cell.
   std::vector<Action> moves;
+  std::array<std::array<int, 15>, 15> board;
+  for (int i=0; i<15; i++) {
+    for (int j=0; j<15; j++) {
+      if (BoardAt(i, j) == CellState::kEmpty) {
+        board[i][j] = 0;
+      } else if (BoardAt(i, j) == CellState::kBlack) {
+        board[i][j] = 1;
+      } else if (BoardAt(i, j) == CellState::kWhite) {
+        board[i][j] = 2;
+      }
+    }
+  }
+  RenjuEvalation evalation;
+
   std::array<std::array<int, 16>, 16> preSum;
   for (int i=1; i<=15; i++) {
     for (int j=1; j<=15; j++) {
@@ -151,6 +157,12 @@ std::vector<Action> RenjuState::LegalActions() const {
     if (board_[cell] == CellState::kEmpty) {
       int x = cell / 15;
       int y = cell % 15;
+      if (PlayerToState(CurrentPlayer()) == CellState::kBlack &&
+          forbidden_rule_ &&
+          evalation.isForbidenMove(board, x, y)
+      ) {
+        continue;
+      }
       int lx = std::max(0, x-2);
       int ly = std::max(0, y-2);
       int rx = std::min(15, x+3);
@@ -173,7 +185,7 @@ std::string RenjuState::ActionToString(Player player,
 
 bool RenjuState::IsFull() const { return num_moves_ == kNumCells; }
 
-RenjuState::RenjuState(std::shared_ptr<const Game> game) : State(game) {
+RenjuState::RenjuState(std::shared_ptr<const Game> game, bool forbidden_rule_) : State(game), forbidden_rule_(forbidden_rule_) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
 }
 
@@ -248,7 +260,8 @@ std::string RenjuGame::ActionToString(Player player,
 }
 
 RenjuGame::RenjuGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      forbidden_rule_(ParameterValue<bool>("forbidden_rule")) {}
 
 std::vector<double> RenjuState::Rewards() const {
   if (IsTerminal()) {

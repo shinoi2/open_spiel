@@ -340,5 +340,218 @@ double RenjuEvalation::evaluate(const std::array<std::array<int, 15>, 15>& board
   return tanh(score / 2000);
 }
 
+bool in_board(const int x, const int y) {
+  return x >= 0 && x < 15 && y >= 0 && y < 15;
+}
+
+bool is_black(std::array<std::array<int, 15>, 15>& board, const int x, const int y) {
+  if (in_board(x, y)) {
+    return board[x][y] == BLACK;
+  }
+  return false;
+}
+
+bool is_empty(std::array<std::array<int, 15>, 15>& board, const int x, const int y) {
+  if (in_board(x, y)) {
+    return board[x][y] == EMPTY;
+  }
+  return false;
+}
+
+int _find_length(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  int count = 0;
+  for (int i=1; i<=15; i++) {
+    int ix = x + dx * i;
+    int iy = y + dy * i;
+    if (in_board(ix, iy) && board[ix][iy] == BLACK) {
+      count ++;
+    } else {
+      break;
+    }
+  }
+  return count;
+}
+
+int find_length(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  return _find_length(board, x, y, dx, dy) + _find_length(board, x, y, -dx, -dy) + 1;
+}
+
+bool is_five(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  return find_length(board, x, y, dx, dy) == 5;
+}
+
+bool is_long(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  return find_length(board, x, y, dx, dy) > 5;
+}
+
+bool has_five(std::array<std::array<int, 15>, 15>& board, const int x, const int y) {
+  return (is_five(board, x, y, 1, 0) ||
+          is_five(board, x, y, 0, 1) ||
+          is_five(board, x, y, 1, 1) ||
+          is_five(board, x, y, 1, -1));
+}
+
+bool has_long(std::array<std::array<int, 15>, 15>& board, const int x, const int y) {
+  return (is_long(board, x, y, 1, 0) ||
+          is_long(board, x, y, 0, 1) ||
+          is_long(board, x, y, 1, 1) ||
+          is_long(board, x, y, 1, -1));
+}
+bool _isForbidenMove(std::array<std::array<int, 15>, 15>& board, const int x, const int y);
+
+bool is_live_four(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  int l = _find_length(board, x, y, dx, dy);
+  int r = _find_length(board, x, y, -dx, -dy);
+  if (l + r + 1 != 4) {
+    return false;
+  }
+  int lx = x + (l + 1) * dx;
+  int ly = y + (l + 1) * dy;
+  int rx = x - (r + 1) * dx;
+  int ry = y - (r + 1) * dy;
+  if (!is_empty(board, lx, ly)) {
+    return false;
+  }
+  if (!is_empty(board, rx, ry)) {
+    return false;
+  }
+  lx += dx;
+  ly += dy;
+  rx -= dx;
+  ry -= dy;
+  if (is_black(board, lx, ly)) {
+    return false;
+  }
+  if (is_black(board, rx, ry)) {
+    return false;
+  }
+  return true;
+}
+
+bool is_dead_four(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  if (is_live_four(board, x, y, dx, dy)) {
+    return false;
+  }
+  int l = _find_length(board, x, y, dx, dy);
+  int lx = x + (l + 1) * dx;
+  int ly = y + (l + 1) * dy;
+  if (!is_empty(board, lx, ly)) {
+    return false;
+  }
+  board[lx][ly] = BLACK;
+  if (is_five(board, lx, ly, dx, dy)) {
+    board[lx][ly] = EMPTY;
+    return true;
+  }
+  board[lx][ly] = EMPTY;
+  return false;
+}
+
+bool is_four(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  if (is_live_four(board, x, y, dx, dy)) {
+    return true;
+  }
+  if (is_dead_four(board, x, y, dx, dy)) {
+    return true;
+  }
+  if (is_dead_four(board, x, y, -dx, -dy)) {
+    return true;
+  }
+  return false;
+}
+
+int four_count(std::array<std::array<int, 15>, 15>& board, const int x, const int y) {
+  int count = 0;
+  if (is_four(board, x, y, 1, 0)) {
+    count ++;
+  }
+  if (is_four(board, x, y, 0, 1)) {
+    count ++;
+  }
+  if (is_four(board, x, y, 1, 1)) {
+    count ++;
+  }
+  if (is_four(board, x, y, 1, -1)) {
+    count ++;
+  }
+  return count;
+}
+
+bool _is_live_three(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  if (is_live_four(board, x, y, dx, dy)) {
+    if (has_five(board, x, y)) {
+      return false;
+    }
+    bool f = _isForbidenMove(board, x, y);
+    return !f;
+  }
+  return false;
+}
+
+bool is_live_three(std::array<std::array<int, 15>, 15>& board, const int x, const int y, const int dx, const int dy) {
+  int l = _find_length(board, x, y, dx, dy);
+  int lx = x + (l + 1) * dx;
+  int ly = y + (l + 1) * dy;
+  if (!is_empty(board, lx, ly)) {
+    return false;
+  }
+  board[lx][ly] = BLACK;
+  bool f = _is_live_three(board, lx, ly, dx, dy);
+  board[lx][ly] = EMPTY;
+  return f;
+}
+
+int live_three_count(std::array<std::array<int, 15>, 15>& board, const int x, const int y) {
+    int count = 0;
+  if (is_live_three(board, x, y, 1, 0)) {
+    count ++;
+  }
+  else if (is_live_three(board, x, y, -1, 0)) {
+    count ++;
+  }
+  if (is_live_three(board, x, y, 0, 1)) {
+    count ++;
+  }
+  else if (is_live_three(board, x, y, 0, -1)) {
+    count ++;
+  }
+  if (is_live_three(board, x, y, 1, 1)) {
+    count ++;
+  }
+  else if (is_live_three(board, x, y, -1, -1)) {
+    count ++;
+  }
+  if (is_live_three(board, x, y, 1, -1)) {
+    count ++;
+  }
+  else if (is_live_three(board, x, y, -1, 1)) {
+    count ++;
+  }
+  return count;
+}
+
+bool _isForbidenMove(std::array<std::array<int, 15>, 15>& board, const int x, const int y) {
+  if (has_five(board, x, y)) {
+    return false;
+  }
+  if (has_long(board, x, y)) {
+    return true;
+  }
+  if (four_count(board, x, y) >= 2) {
+    return true;
+  }
+  if (live_three_count(board, x, y) >= 2) {
+    return true;
+  }
+  return false;
+}
+
+bool RenjuEvalation::isForbidenMove(std::array<std::array<int, 15>, 15>& board, const int x, const int y) {
+  board[x][y] = BLACK;
+  bool f = _isForbidenMove(board, x, y);
+  board[x][y] = EMPTY;
+  return f;
+}
+
 }  // namespace renju
 }  // namespace open_spiel
