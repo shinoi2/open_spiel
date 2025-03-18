@@ -56,6 +56,7 @@ EXPECTED_GAMES = frozenset([
     "dots_and_boxes",
     "dou_dizhu",
     "efg_game",
+    "einstein_wurfelt_nicht",
     "euchre",
     "first_sealed_auction",
     "gin_rummy",
@@ -91,6 +92,7 @@ EXPECTED_GAMES = frozenset([
     "mfg_dynamic_routing",
     "mfg_garnet",
     "misere",
+    "mnk",
     "morpion_solitaire",
     "negotiation",
     "nfg_game",
@@ -173,6 +175,7 @@ class PyspielTest(absltest.TestCase):
         # Only add games here if there is no sensible default for a parameter.
         "add_noise",
         "cached_tree",
+        "coop_to_1p",
         "efg_game",
         "nfg_game",
         "misere",

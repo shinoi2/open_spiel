@@ -87,6 +87,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_backgammon.h
   pybind11/games_bargaining.cc
   pybind11/games_bargaining.h
+  pybind11/games_blackjack.cc
+  pybind11/games_blackjack.h
   pybind11/games_bridge.cc
   pybind11/games_bridge.h
   pybind11/games_chess.cc
@@ -109,6 +111,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_spades.h
   pybind11/games_tarok.cc
   pybind11/games_tarok.h
+  pybind11/games_tic_tac_toe.cc
+  pybind11/games_tic_tac_toe.h
   pybind11/games_tiny_bridge.cc
   pybind11/games_tiny_bridge.h
   pybind11/games_trade_comm.cc
@@ -239,11 +243,14 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
   tests/game_transforms_test.py
+  tests/games_blackjack_test.py
   tests/games_bridge_test.py
+  tests/games_bargaining_test.py
   tests/games_chess_test.py
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_sim_test.py
+  tests/games_tic_tac_toe_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py
@@ -271,7 +278,6 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/nfsp_jax_test.py
     jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
-    algorithms/rnad/rnad_test.py
     coalitional_games/least_core_lagrangian_test.py
     mfg/algorithms/fictitious_play_test.py
   )

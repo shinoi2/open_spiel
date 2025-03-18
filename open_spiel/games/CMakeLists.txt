@@ -71,6 +71,8 @@ set(GAME_SOURCES
   efg_game/efg_game.h
   efg_game/efg_game_data.cc
   efg_game/efg_game_data.h
+  einstein_wurfelt_nicht/einstein_wurfelt_nicht.cc
+  einstein_wurfelt_nicht/einstein_wurfelt_nicht.h
   euchre/euchre.cc
   euchre/euchre.h
   first_sealed_auction/first_sealed_auction.cc
@@ -120,6 +122,8 @@ set(GAME_SOURCES
   mfg/dynamic_routing.h
   mfg/garnet.cc
   mfg/garnet.h
+  mnk/mnk.cc
+  mnk/mnk.h
   morpion_solitaire/morpion_solitaire.cc
   morpion_solitaire/morpion_solitaire.h
   negotiation/negotiation.cc
@@ -426,6 +430,10 @@ add_executable(efg_game_test efg_game/efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(efg_game_test efg_game_test)
 
+add_executable(einstein_wurfelt_nicht_test einstein_wurfelt_nicht/einstein_wurfelt_nicht_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(einstein_wurfelt_nicht_test einstein_wurfelt_nicht_test)
+
 add_executable(euchre_test euchre/euchre_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(euchre_test euchre_test)
@@ -512,6 +520,10 @@ add_test(matching_pennies_3p_test matching_pennies_3p_test)
 add_executable(matrix_games_test matrix_games/matrix_games_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(matrix_games_test matrix_games_test)
+
+add_executable(mnk_test mnk/mnk_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(mnk_test mnk_test)
 
 add_executable(morpion_solitaire_test morpion_solitaire/morpion_solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
         $<TARGET_OBJECTS:tests>)
